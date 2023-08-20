@@ -21,20 +21,46 @@ namespace ArrayExtensions
         /// </example>
         public static int[] FilterByDigit(this int[]? source, int digit)
         {
-            // Add necessary code here, than remove comment.
-            foreach (var item in source)
+            if (digit is < 0 or > 9)
             {
+                throw new ArgumentOutOfRangeException(nameof(digit), "Сan not be less than zero or more then 9.");
+            }
+
+            CheckForNull(source!);
+
+            List<int> result = new List<int>();
+
+            for (var i = 0; i < source!.Length; i++)
+            {
+                var item = source[i];
                 if (IsMatch(item))
                 {
-                    // Add necessary code here, than remove comment.
+                    result.Add(item);
                 }
             }
 
-            throw new NotImplementedException();
+            return result.ToArray();
 
-            static bool IsMatch(int value)
+            bool IsMatch(int value)
             {
-                throw new NotImplementedException();
+                long longValue = value;
+
+                if (digit == 0 && longValue == 0)
+                {
+                    return true;
+                }
+
+                longValue = (longValue < 0) ? -longValue : longValue;
+
+                for (; longValue != 0; longValue /= 10)
+                {
+                    if (longValue % 10 == digit)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 
@@ -51,20 +77,74 @@ namespace ArrayExtensions
         /// </example>
         public static int[] FilterByPalindromic(this int[]? source)
         {
-            // Add necessary code here, than remove comment.
-            foreach (var item in source)
+            CheckForNull(source!);
+
+            List<int> result = new List<int>();
+
+            for (var i = 0; i < source!.Length; i++)
             {
+                var item = source[i];
                 if (IsMatch(item))
                 {
-                    // Add necessary code here, than remove comment.
+                    result.Add(item);
                 }
             }
 
-            throw new NotImplementedException();
+            return result.ToArray();
 
-            static bool IsMatch(int value)
+            bool IsMatch(int value)
             {
-                throw new NotImplementedException();
+                long longValue = value;
+
+                int div = (int)Math.Pow(10, GetNumLength(value) - 1);
+
+                // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+                while (value != 0)
+                {
+                    long firstDigit = longValue / div;
+                    long lastDigit = longValue % 10;
+
+                    if ((firstDigit != lastDigit) || (longValue < 0))
+                    {
+                        return false;
+                    }
+
+                    longValue = (longValue % div) / 10;
+                    div /= 100;
+                }
+
+                return true;
+            }
+
+            int GetNumLength(int num)
+            {
+                int length = 0;
+                while (num != 0)
+                {
+                    num /= 10;
+                    length++;
+                }
+
+                return length;
+            }
+        }
+
+        /// <summary>
+        /// Check souse array for nul adn empty.
+        /// </summary>
+        /// <param name="source">Source array.</param>
+        /// <exception cref="ArgumentNullException">Throw when array is null.</exception>
+        /// <exception cref="ArgumentException">Throw when array is empty.</exception>
+        private static void CheckForNull(int[] source)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source), "Array is null");
+            }
+
+            if (source.Length == 0)
+            {
+                throw new ArgumentException("Array is empty", nameof(source));
             }
         }
     }
